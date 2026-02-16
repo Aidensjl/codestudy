@@ -1,0 +1,88 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(CJAPP LANGUAGES CXX)
+
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "编译类型" FORCE)
+endif()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+set(OUTPUT_DIR "${PROJECT_SOURCE_DIR}/out")
+file(MAKE_DIRECTORY "${OUTPUT_DIR}")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
+
+foreach(cfg IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
+  string(TOUPPER "${cfg}" cfg_upper)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${cfg_upper} "${OUTPUT_DIR}")
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${cfg_upper} "${OUTPUT_DIR}")
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${cfg_upper} "${OUTPUT_DIR}")
+endforeach()
+
+if(MSVC)
+  add_compile_options(/W4 /permissive-)
+else()
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
+
+option(USE_LIB_MODE "ON=先编库再链接，OFF=多源文件直接编译" OFF)
+option(BUILD_SHARED "ON=构建为动态库，OFF=构建为静态库" OFF)
+
+if(BUILD_SHARED)
+  set(LIB_TYPE SHARED)
+else()
+  set(LIB_TYPE STATIC)
+endif()
+
+if(NOT USE_LIB_MODE)
+  add_executable(${PROJECT_NAME}
+    main.cpp
+    ModuleA/src/ModuleA.cpp
+    ModuleB/src/ModuleB.cpp
+  )
+
+  target_include_directories(${PROJECT_NAME} PRIVATE
+    ${PROJECT_SOURCE_DIR}/ModuleA/include
+    ${PROJECT_SOURCE_DIR}/ModuleB/include
+  )
+else()
+  add_library(ModuleA ${LIB_TYPE}
+    ModuleA/src/ModuleA.cpp
+  )
+  target_include_directories(ModuleA PUBLIC
+    ${PROJECT_SOURCE_DIR}/ModuleA/include
+  )
+  if(WIN32 AND BUILD_SHARED)
+    target_compile_definitions(ModuleA PRIVATE MODULEA_EXPORTS)
+    target_compile_definitions(ModuleA PUBLIC MODULEA_SHARED)
+  endif()
+
+  add_library(ModuleB ${LIB_TYPE}
+    ModuleB/src/ModuleB.cpp
+  )
+  target_include_directories(ModuleB PUBLIC
+    ${PROJECT_SOURCE_DIR}/ModuleB/include
+  )
+  if(WIN32 AND BUILD_SHARED)
+    target_compile_definitions(ModuleB PRIVATE MODULEB_EXPORTS)
+    target_compile_definitions(ModuleB PUBLIC MODULEB_SHARED)
+  endif()
+
+  add_executable(${PROJECT_NAME}
+    main.cpp
+  )
+
+  target_link_libraries(${PROJECT_NAME} PRIVATE ModuleA ModuleB)
+endif()
+
+message(STATUS "Project Name: ${PROJECT_NAME}")
+message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "build Mode: ${USE_LIB_MODE}")
+message(STATUS "lib type: ${LIB_TYPE}")
+message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "Output Dir: ${OUTPUT_DIR}")
