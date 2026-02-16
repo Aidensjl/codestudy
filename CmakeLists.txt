@@ -13,6 +13,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(OUTPUT_DIR "${PROJECT_SOURCE_DIR}/out")
 file(MAKE_DIRECTORY "${OUTPUT_DIR}")
 
+set(DIST_DIR "${PROJECT_SOURCE_DIR}/dist")
+file(MAKE_DIRECTORY "${DIST_DIR}")
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${OUTPUT_DIR}")
@@ -50,6 +53,13 @@ if(NOT USE_LIB_MODE)
     ${PROJECT_SOURCE_DIR}/ModuleA/include
     ${PROJECT_SOURCE_DIR}/ModuleB/include
   )
+
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:${PROJECT_NAME}>
+      "${DIST_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
+    COMMENT "Copying ${PROJECT_NAME} to ${DIST_DIR}"
+  )
 else()
   add_library(ModuleA ${LIB_TYPE}
     ModuleA/src/ModuleA.cpp
@@ -61,6 +71,12 @@ else()
     target_compile_definitions(ModuleA PRIVATE MODULEA_EXPORTS)
     target_compile_definitions(ModuleA PUBLIC MODULEA_SHARED)
   endif()
+  add_custom_command(TARGET ModuleA POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:ModuleA>
+      "${DIST_DIR}/$<TARGET_FILE_NAME:ModuleA>"
+    COMMENT "Copying ModuleA to ${DIST_DIR}"
+  )
 
   add_library(ModuleB ${LIB_TYPE}
     ModuleB/src/ModuleB.cpp
@@ -72,12 +88,24 @@ else()
     target_compile_definitions(ModuleB PRIVATE MODULEB_EXPORTS)
     target_compile_definitions(ModuleB PUBLIC MODULEB_SHARED)
   endif()
+  add_custom_command(TARGET ModuleB POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:ModuleB>
+      "${DIST_DIR}/$<TARGET_FILE_NAME:ModuleB>"
+    COMMENT "Copying ModuleB to ${DIST_DIR}"
+  )
 
   add_executable(${PROJECT_NAME}
     main.cpp
   )
 
   target_link_libraries(${PROJECT_NAME} PRIVATE ModuleA ModuleB)
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+      $<TARGET_FILE:${PROJECT_NAME}>
+      "${DIST_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>"
+    COMMENT "Copying ${PROJECT_NAME} to ${DIST_DIR}"
+  )
 endif()
 
 message(STATUS "Project Name: ${PROJECT_NAME}")
@@ -86,3 +114,5 @@ message(STATUS "build Mode: ${USE_LIB_MODE}")
 message(STATUS "lib type: ${LIB_TYPE}")
 message(STATUS "C++ Compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "Output Dir: ${OUTPUT_DIR}")
+message(STATUS "Dist Dir: ${DIST_DIR}")
+
