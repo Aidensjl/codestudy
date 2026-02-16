@@ -1,0 +1,6 @@
+# 忽略中间生成文件目录
+build*/
+out/
+cmake/
+scripts/
+
