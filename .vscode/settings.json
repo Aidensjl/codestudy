@@ -1,0 +1,5 @@
+{
+  "cmake.buildDirectory": "${workspaceFolder}/build-gdb",
+  "cmake.configureOnOpen": true,
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/build-gdb/compile_commands.json"
+}

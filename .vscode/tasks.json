@@ -1,0 +1,85 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "CMake Configure (MSVC)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S",
+        ".",
+        "-B",
+        "build-msvc",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DUSE_LIB_MODE=ON",
+        "-DBUILD_SHARED=ON"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake Build (Debug-MSVC)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build-msvc",
+        "--config",
+        "Debug",
+        "-j"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "CMake Init+Build (MSVC)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "CMake Configure (MSVC)",
+        "CMake Build (Debug-MSVC)"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake Configure (GDB)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S",
+        ".",
+        "-B",
+        "build-gdb",
+        "-G",
+        "MinGW Makefiles",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_CXX_COMPILER=g++",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+        "-DUSE_LIB_MODE=ON",
+        "-DBUILD_SHARED=ON"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "CMake Build (GDB)",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "--build",
+        "build-gdb",
+        "-j"
+      ],
+      "problemMatcher": "$gcc"
+    },
+    {
+      "label": "CMake Init+Build (GDB)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "CMake Configure (GDB)",
+        "CMake Build (GDB)"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug (MSVC, init once)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/CJAPP.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal",
+      "preLaunchTask": "CMake Init+Build (MSVC)"
+    },
+    {
+      "name": "Debug (MSVC, incremental)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/CJAPP.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "console": "integratedTerminal",
+      "preLaunchTask": "CMake Build (Debug-MSVC)"
+    },
+    {
+      "name": "Debug (gdb, init once)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/CJAPP.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "D:/mingw64/bin/gdb.exe",
+      "preLaunchTask": "CMake Init+Build (GDB)"
+    },
+    {
+      "name": "Debug (gdb, incremental)",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/CJAPP.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "miDebuggerPath": "D:/mingw64/bin/gdb.exe",
+      "preLaunchTask": "CMake Build (GDB)"
+    }
+  ]
+}
